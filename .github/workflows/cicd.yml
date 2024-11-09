@@ -1,0 +1,46 @@
+name: Deploy React App to Azure App Service
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # Asegúrate de que la versión de Node.js sea compatible con tu proyecto
+
+      - name: Install dependencies
+        run: npm install  # Instala las dependencias definidas en tu package.json
+
+      - name: Build the React app
+        run: npm run build  # Usa el script de build de tu package.json para generar los archivos estáticos
+
+      - name: Upload Artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: react-app
+          path: ${{ github.workspace }}/build  # El directorio 'build' generado por React
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download Artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: react-app
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: intento100front  # Nombre de tu app en Azure
+          publish-profile: ${{ secrets.FRONTACTIONSECRET }}  # Secreto con el perfil de publicación correcto
+          package: '${{ github.workspace }}/build'  # Directorio 'build' generado por React
