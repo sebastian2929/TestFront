@@ -46,4 +46,4 @@ jobs:
         with:
           app-name: intento100front
           publish-profile: ${{ secrets.FRONTACTIONSECRET }}
-          package: '${{ github.workspace }}/build'
+          package: '${{ github.workspace }}/react-app/build'
