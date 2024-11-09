@@ -20,11 +20,10 @@ jobs:
           submodules: true
           lfs: false
 
-      # Step to set up Node.js and install dependencies
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'  # Ajusta la versión de Node.js según la que necesites
+          node-version: '18'
 
       - name: Install Dependencies
         run: npm install
@@ -32,19 +31,17 @@ jobs:
       - name: Build the React app
         run: npm run build
 
-      # Step to deploy the app to Azure Static Web Apps
       - name: Build and Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_INTENTO100FRONT }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for GitHub integrations (i.e. PR comments)
+          azure_static_web_apps_api_token: ${{ secrets.FRONTACTIONSECRET }}  # Secreto correcto
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          app_location: "/" # App source code path (usually the root folder of your project)
-          api_location: "" # API source code path - optional (empty if you don't have an API)
-          output_location: "build" # The directory where the React app is built to, which is `build` in React apps
-          ###### End of Repository/Build Configurations ######
+          app_location: "/"
+          api_location: ""
+          output_location: "build"
+          skip_deploy_on_missing_secrets: true  # Esto permite saltarse el despliegue si el token está ausente
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -55,5 +52,5 @@ jobs:
         id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_INTENTO100FRONT }}
+          azure_static_web_apps_api_token: ${{ secrets.FRONTACTIONSECRET }}  # Secreto correcto
           action: "close"
