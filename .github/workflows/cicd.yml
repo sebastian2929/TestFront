@@ -8,36 +8,19 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
-    # Paso para hacer checkout del código
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Check out repository
+        uses: actions/checkout@v3
 
-    # Paso para configurar Node.js
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '18'  # Usa la versión de Node que desees
+      - name: Build the React app
+        run: npm run build
 
-    # Instalar dependencias usando npm
-    - name: Install dependencies
-      run: npm install
-
-    # Construir la aplicación React
-    - name: Build the React app
-      run: npm run build
-
-    # Verificar los archivos generados en la carpeta build
-    - name: List build directory before upload
-      run: ls -R ./build
-
-    # Subir el artefacto generado para su despliegue
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: react-app-build
-        path: ./build
+      - name: Upload production build
+        uses: actions/upload-artifact@v3  # Actualiza aquí a la versión v3
+        with:
+          name: react-app
+          path: ./build
 
   deploy:
     runs-on: ubuntu-latest
