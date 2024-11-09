@@ -1,55 +1,63 @@
-name: Deploy React App to Azure App Service
+name: Build and Deploy React App to Azure
 
 on:
   push:
     branches:
-      - main
+      - main  # Cambia esto si usas otra rama
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v3
+    # Paso para hacer checkout del código
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+    # Paso para configurar Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'  # Usa la versión de Node que desees
 
-      - name: Install dependencies
-        run: npm install
+    # Instalar dependencias usando npm
+    - name: Install dependencies
+      run: npm install
 
-      - name: Build the React app
-        run: npm run build
+    # Construir la aplicación React
+    - name: Build the React app
+      run: npm run build
 
-      - name: List build directory after build
-        run: ls -R ./build
+    # Verificar los archivos generados en la carpeta build
+    - name: List build directory before upload
+      run: ls -R ./build
 
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: react-app
-          path: ./build
+    # Subir el artefacto generado para su despliegue
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: react-app-build
+        path: ./build
 
   deploy:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build  # Este paso depende de que el paso de build termine
+
     steps:
-      - name: Checkout Source
-        uses: actions/checkout@v3
+    # Hacer checkout del código
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Download build artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: react-app
+    # Descargar el artefacto previamente subido
+    - name: Download build artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: react-app-build
 
-      - name: List directory structure of downloaded artifact
-        run: ls -R ./react-app
-
-      - name: Deploy to Azure App Service
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: intento100front
-          publish-profile: ${{ secrets.FRONTACTIONSECRET }}
-          package: './react-app/build'
+    # Paso para desplegar en Azure
+    - name: Deploy to Azure Web App
+      uses: Azure/webapps-deploy@v2
+      with:
+        app-name: 'nombre-de-tu-aplicacion-en-azure'  # Cambia por el nombre de tu aplicación en Azure
+        publish-profile: ${{ secrets.FRONTACTIONSECRET }}  # Asegúrate de tener el secreto de publicación configurado
+        package: './build'  # Ruta a la carpeta build generada por React
